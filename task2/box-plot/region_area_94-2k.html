@@ -1,0 +1,207 @@
+    <html>
+        <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                <meta name="description" content="Visualziacion Exbecarios Fulbright de Colombia por regiones, entre 1994 - 2004">
+                <meta name="author" content="Camilo Mera">
+                <style>
+                        .svg-container{
+                            width: 100%;
+                        }
+                    </style>
+        </head>
+        <body>
+            <div id='myDiv'/>
+            <script src="https://d3js.org/d3.v4.min.js"></script>
+            <script src="https://d3js.org/d3-array.v1.min.js"></script>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <script>
+
+                function setLayout(data){                       
+
+                    var layout = {
+                        yaxis:{
+                            title: 'Alumnus per year',
+                            zeroline: false
+                        }
+                        , boxmode: 'group'
+                    };
+
+                    Plotly.newPlot('myDiv', data, layout);
+                }
+
+                 function getData(){
+                    var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                    var xAxis = [
+                        'Amazonia', 'Amazonia', 'Amazonia', 'Amazonia','Amazonia','Amazonia','Amazonia','Amazonia',                        
+                        'Caribe', 'Caribe', 'Caribe', 'Caribe', 'Caribe', 'Caribe', 'Caribe', 'Caribe',
+                        'Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense','Cundi-Boyacense',
+                        'Eje-cafetero', 'Eje-cafetero', 'Eje-cafetero', 'Eje-cafetero','Eje-cafetero','Eje-cafetero', 'Eje-cafetero', 'Eje-cafetero',
+                        'Llanos Orientales','Llanos Orientales','Llanos Orientales','Llanos Orientales','Llanos Orientales','Llanos Orientales','Llanos Orientales','Llanos Orientales',
+                        'Santanderes','Santanderes','Santanderes','Santanderes','Santanderes','Santanderes','Santanderes','Santanderes',
+                        'Sur-Occidente', 'Sur-Occidente', 'Sur-Occidente', 'Sur-Occidente', 'Sur-Occidente','Sur-Occidente', 'Sur-Occidente','Sur-Occidente',
+                        'Tolima Grande','Tolima Grande', 'Tolima Grande', 'Tolima Grande', 'Tolima Grande', 'Tolima Grande','Tolima Grande','Tolima Grande',
+                        'Valle de Aburra', 'Valle de Aburra', 'Valle de Aburra', 'Valle de Aburra', 'Valle de Aburra','Valle de Aburra', 'Valle de Aburra','Valle de Aburra'
+                        ];
+
+                    var area = [
+                        'LAW','PHYSICAL SCIENCES & MATHEMATICS','BUSINESS ADMINISTRATION & MANAGEMENT',
+                        'ART & ARCHITECTURE','EDUCATION', 'BIOLOGICAL, AGRICULTURAL & HEALTH SCIENCES',
+                        'ENGINEERING & APPLIED SCIENCES','HUMANITIES & SOCIAL SCIENCES'];
+
+                    var data = []
+
+                    var law_c = {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[0],
+                        marker: {color: color(0)},
+                        type: 'box'                    
+                    }                    
+
+                    var physical_c = {
+                        x: xAxis,
+                        y: [                            
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,1,0,0,0,0,0,0,0,1,
+                        0,0,0,0,0,0,0,0,0,1,0,
+                        0,0,0,0,0,0,0,0,0,1,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,1,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[1],
+                        marker: {color: color(1)},
+                        type: 'box'                    
+                    };
+
+                    var business_c = {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,1,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[2],
+                        marker: {color: color(2)},
+                        type: 'box'                    
+                    };
+
+                    var arts_c = {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[3],
+                        marker: {color: color(3)},
+                        type: 'box'                    
+                    };
+
+                    var edu_c = {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,1,1,1,0,1,1,0,1,0,
+                        0,0,0,0,1,0,0,0,0,0,0,
+                        1,0,1,1,1,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        1,0,1,0,0,1,0,1,0,0,0,
+                        0,0,0,1,0,0,2,0,0,0,1,
+                        0,0,0,0,0,2,0,0,0,1,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[4],
+                        marker: {color: color(4)},
+                        type: 'box'                    
+                    };
+
+                    var bio_c = {
+                        x: xAxis,
+                        y: [
+                        1,0,0,1,0,0,0,0,1,0,0,
+                        0,0,0,0,0,2,1,0,0,0,1,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,1,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,1,0,1,0,0,
+                        0,0,0,0,0,0,1,0,0,0,0,
+                        0,0,1,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,1,0,0,0,0,0,
+                        0,0,0,0,0,0,1,0,0,0,0
+                        ],
+                        name: area[5],
+                        marker: {color: color(5)},
+                        type: 'box'                    
+                    };                    
+
+                    var eng_c =  {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,1,1,1,2,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,1,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,1,0,1,1,0,0,2,1,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[6],
+                        marker: {color: color(6)},
+                        type: 'box'                    
+                    };
+
+                    var humanities_c = {
+                        x: xAxis,
+                        y: [
+                        0,0,0,0,0,1,0,0,0,0,0,
+                        0,0,0,1,0,0,1,0,1,1,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,1,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,1,0,
+                        1,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0,
+                        0,0,0,0,0,0,0,0,0,0,0
+                        ],
+                        name: area[7],
+                        marker: {color: color(7)},
+                        type: 'box'                    
+                    };
+
+                    data.push(law_c, physical_c, eng_c, business_c, edu_c, arts_c, bio_c, humanities_c);
+                    return data;
+                }
+
+                 var _data = getData();
+                setLayout(_data);         
+
+            </script>
+        </body>
+    </html>
