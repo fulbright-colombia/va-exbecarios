@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    html, body, #D3Plus_RingNetwork, #DataFilterPane {
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.min.css">
+<link rel="stylesheet" href="https://dexjs.net/js/dex-jquery.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css"/>
+<link rel="stylesheet" href="https://dexjs.net/js/dex-bootstrap.css">
+<link rel="stylesheet" href="https://dexjs.net/js/dex.css">
+
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://dexjs.net/js/dex-jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://dexjs.net/js/dex-bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://dexjs.net/js/dex-libs.js"></script>
+<script src="https://dexjs.net/js/dex.js"></script><script>d3 = dex.charts.d3.d3v3;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3plus/1.9.8/d3plus.min.js"></script>
+<body>
+  <div class="ui-layout-center">
+      <div id="D3Plus_RingNetwork"></div>
+  </div>
+  <div class="ui-layout-west">
+      <div id="DataFilterPane"></div>
+  </div>
+<script>
+
+  d3.csv("data/90decade.csv", function(error, data) {
+    var csv = new dex.csv(data).include([2,1,0]);
+    // Configure a chart.
+  var network = dex.charts.d3plus.RingNetwork({
+      'parent': '#D3Plus_RingNetwork',
+      'type': 'rings',
+      'edges': {'arrows': true},
+      'csv': csv.include([2,1])
+    })
+
+    $(document).ready(function () {
+      $('body').layout({
+        applyDemoStyles: false,
+        west: {
+          size: 335
+        },
+        onresize: function () {
+          network.resize();
+        }
+      });
+
+      network.render();
+
+      var dataFilterPane = dex.ui.DataFilterPane({
+        "parent": "#DataFilterPane",
+        "csv": csv,
+        "components": [network]
+      }).render();
+      network.subscribe(dataFilterPane, "select", function (msg) {
+      network.attr("csv", msg.selected).refresh();
+ });
+    });
+  });
+</script>
+</body>
+</html>

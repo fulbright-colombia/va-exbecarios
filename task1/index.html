@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>Evolución Becas Fulbright</title>
+  <!--link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.1.15-beta/nv.d3.css"-->  
+  <link rel = "stylesheet" href = "css/nv.d3.css">
+  <style>
+    body {
+      font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 11px;
+    }
+    p {
+      font-size: 13px;
+      text-align: justify;
+    }
+    .rotulos {
+      font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: rgb(128,128,128);
+    }    
+    .tabla {
+      font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      color: rgb(128,128,128);
+    }    
+    .nv-x text{
+     font-size: 11px;     
+    }
+    .nv-legend text{
+      font-size: 11px;
+
+    }
+  </style>
+</head>
+<body>
+  <script src="https://d3js.org/d3.v3.js"></script>
+  <!--script src = "https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.1.15-beta/nv.d3.js"></script-->
+  <script src="lib/nv.d3.js"></script>
+  <table align="center" style="width:100%;">
+    <tr>
+      <td colspan="2">
+        <p>&nbsp;</p>
+      </td>
+    </tr>
+    <tr>
+      <td width="60%"><div id="chart"><svg width="900" height="600"></svg></div></td>
+      <td width="30%"><div id="details"></div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2"><div id="insights"></td>
+    </tr>
+  </table>
+  <script>
+
+    var margin = {top: 0, right: 0, bottom: 0, left: 0},
+        width = 300 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    var svg = d3.select("#details")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(20,0)");
+
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)                                    
+        .attr("x", 0) 
+        .attr("y", 0)
+        .attr("id", "mouse-tracker")
+        //.style("fill", "#FBFCFC");
+        .style("fill", "white");                 
+
+    var svg2 = d3.select("#insights")
+                .append("svg")
+                .attr("width", 800)
+                .attr("height", 200)
+                .append("g")
+                .attr("transform", "translate(0,0)");
+
+    svg2.append("rect")
+        .attr("width", 800)
+        .attr("height", 200)                                    
+        .attr("x", 0) 
+        .attr("y", 0)
+        .style("fill", "white");                              
+
+
+    d3.csv('data/dataStacked2.csv', function(data2) {
+
+      var becasPorAnyoPorConvenio = d3.nest()
+                                      .key(function(d){ return d["COHORTE"]; })
+                                      .key(function(d){ return d["ABBREV."]; })
+                                      .rollup(function(v) { return v.length; })
+                                      .entries(data2)
+                                      .map(function(group) {
+                                        return { 
+                                                 "anyo":group.key
+                                                ,"values" : group.values.map(function(group2) { 
+                                                  return {"beca": group2.key, "total": +group2.values} 
+                                                  })
+                                               }
+                                       });
+    
+// console.log("becasPorAnyoPorConvenio");
+// console.log(becasPorAnyoPorConvenio);
+
+      var becasPorAnyo = d3.nest()
+                           .key(function(d){ return d["COHORTE"]; })
+                           .rollup(function(v) { return v.length; })
+                           .entries(data2)
+                           .map(function(group) {
+                             return { "anyo":group.key,"becas" : +group.values}
+                            });
+    
+// console.log("becasPorAnyo");
+// console.log(becasPorAnyo);
+
+      var becasPorConvenio = d3.nest()
+                               .key(function(d){ return d["ABBREV."]; })
+                               .rollup(function(v) { return v.length; })
+                               .entries(data2);
+      var totalBecas = 0;
+      for (var i=0; i<becasPorConvenio.length; i++) {
+        totalBecas += becasPorConvenio[i]["values"];
+      }  
+      becasPorConvenio.push({key: "TOTAL", values: totalBecas});
+
+// console.log("becasPorConvenio"); 
+// console.log(becasPorConvenio); 
+
+      var becasPorAnyoPorConvenioMerge = combinarDatasets();
+
+// console.log("becasPorAnyoPorConvenioMerge");
+// console.log(becasPorAnyoPorConvenioMerge);
+
+
+      d3.csv('data/dataStacked1.csv', function(data) {
+      
+
+
+
+        var dataToPlot = Object.keys(data[0]).filter(function(k){return k!="ANYO"})
+          .map(function(k){
+            return {"key":k,"values":data.map(function(d){
+             return {
+               "x":d.ANYO,
+               "y":+d[k]
+             }
+            })}
+          })
+
+        console.log("dataToPlot");
+        console.log(dataToPlot);
+
+
+        nv.addGraph(function() {
+          var chart = nv.models.stackedAreaChart()
+                               .margin({left: 60})
+                               .margin({right: 15})
+                               .margin({bottom: 40})
+                               .x(function(d) { return d.x })
+                               .y(function(d) { return d.y })
+                               .useInteractiveGuideline(true)
+                               .rightAlignYAxis(false)
+                               .showControls(true)       //Allow user to choose 'Stacked', 'Stream', 'Expanded' mode.
+                               .clipEdge(true);
+
+          chart.xAxis.tickFormat(function(d) { return d; }).axisLabel("Year")
+          chart.yAxis.tickFormat(d3.format(',.0f')).axisLabel("Granted Scholarships");
+          chart.legend.rightAlign(true);
+          chart.xDomain([d3.min(becasPorAnyo, function(d){return d.anyo}), d3.max(becasPorAnyo, function(d){return d.anyo})]);
+          //chart.interactiveLayer.tooltip.fixedTop(100);
+          chart.useInteractiveGuideline(true);
+          // chart.interactiveLayer.tooltip.gravity('s')
+          chart.interactiveLayer.tooltip.chartContainer(d3.select('td #chart svg'));
+
+          d3.select('#chart svg')
+            .datum(dataToPlot)
+            .call(chart)
+            .on("mousemove.mine", function(dataset){
+
+              var mouseCoords = d3.mouse(this);
+              var x = chart.stacked.xScale().invert(mouseCoords[0]-chart.margin().left);
+              var pointIndex = Math.trunc(x);
+
+              if (pointIndex >= 1958 && pointIndex <= 2015) {
+                var vals = dataToPlot.map(function(d) {
+                    var obj= {};
+                    obj.key = d.key;
+                    obj.values = d.values.filter(function (object) {
+                      return object.x == pointIndex;
+                    });
+                    return obj;
+                });
+
+                var becasPorAnyoPorConvenioMergeFiltrado = filtrarDataConvenios(pointIndex);
+
+                legend.select("text")
+                      .style("fill", function(columnName) {return determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado)});
+
+                actual.select("text")
+                     .text(function(columnName){ 
+                      var beca = becasPorAnyoPorConvenioMergeFiltrado.filter(function (d) { return d.key == columnName.key });
+                      return beca[0].total; 
+                    })
+                     .style("fill", function(columnName) {return determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado)});
+
+                anterior.select("text")
+                     .text(function(columnName){ 
+                      var beca = becasPorAnyoPorConvenioMergeFiltrado.filter(function (d) { return d.key == columnName.key });
+                      return beca[0].totalAnterior; 
+                    })
+                    .style("fill", function(columnName) {return determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado)});
+
+                variacion.select("text")
+                         .text(function(columnName){ 
+                          var beca = becasPorAnyoPorConvenioMergeFiltrado.filter(function (d) { return d.key == columnName.key });
+                          return d3.format(".0%")(beca[0].var); 
+                         })
+                         .style("fill", function(columnName) {return determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado)});
+
+                 insight.html(function(a) {
+                 	if (pointIndex <= 1978) {
+                 		return "";
+                 	}
+                 	if (pointIndex >= 1979 && pointIndex <= 1989) { 
+                 		return "The decade of Humanities and Social Sciences: in average  25 schoolarships were granted (per year)"
+
+// SUNY Stony Brook    12
+
+
+
+                 	} 
+                 	if (pointIndex >= 1990 && pointIndex <= 1996) {
+                 		return "Granted scholarships decreased 73%. Only 4 scholarships per year where granted"	;
+                 	}
+                 	if (pointIndex >= 1997) {
+                 		return "Education: There were up to 49 granted scholarships per year. Arts & Architecture, and Biologic increased its granted scholarships as well.";
+                 	}
+                 });
+
+              }
+
+
+
+            })
+            .on("mouseout.mine", function(dataset) {
+              legend.select("text").style("fill", "black");
+              actual.select("text").text(function(d, i) { return ""; });
+              anterior.select("text").text(function(d, i) { return ""; });
+              variacion.select("text").text(function(d, i) { return ""; });
+            });
+
+        // d3.select('.nv-legendWrap').attr('transform', 'translate(140, -60)')
+
+          nv.utils.windowResize(chart.update);
+          return chart;
+        });
+
+
+        svg.append ("text").attr("x", 40).attr("y", 20).text("Stats per Agreement").attr("class", "rotulos");
+        svg.append ("text").attr("x", 10).attr("y", 60).text("Agreement").attr("class", "rotulos");
+        svg.append ("text").attr("x", 90).attr("y", 60).text("Current").attr("class", "rotulos");
+        svg.append ("text").attr("x", 150).attr("y", 60).text("Previous").attr("class", "rotulos");
+        svg.append ("text").attr("x", 220).attr("y", 60).text("%YoY").attr("class", "rotulos");
+
+
+        var legendSpace = 85;
+        var legendInter = 10;
+        var legend = svg.selectAll(".legend")
+                        .data(becasPorConvenio)
+                        .enter()
+                        .append("g")
+                        .attr("class", "legend");
+
+        legend.append("text")
+              .attr("x", 10) 
+              .attr("y", function (d, i) { return i * legendInter  + legendSpace; })
+              .text(function(d) { return d.key; }); 
+
+
+
+
+        var actual = svg.selectAll(".actual")
+                       .data(becasPorConvenio)
+                       .enter()
+                       .append("g")
+                       .attr("class", "tabla");
+
+        actual.append("text")
+              .attr("x", 90) 
+              .attr("y", function (d, i) { return i * legendInter + legendSpace; });
+
+        var anterior = svg.selectAll(".anterior")
+                       .data(becasPorConvenio)
+                       .enter()
+                       .append("g")
+                       .attr("class", "tabla");
+
+        anterior.append("text")
+              .attr("x", 150) 
+              .attr("y", function (d, i) { return i * legendInter + legendSpace; });
+
+
+        var variacion = svg.selectAll(".variacion")
+                           .data(becasPorConvenio)
+                           .enter()
+                           .append("g")
+                           .attr("class", "tabla");
+
+        variacion.append("text")
+                  .attr("x", 220) 
+                  .attr("y", function (d, i) { return i * legendInter + legendSpace; });
+
+        
+		var insight = svg2.append ("text")
+						  .attr("x", 20)
+						  .attr("y", 20)
+						  .attr("class", "rotulos");
+
+      });
+
+
+
+      function combinarDatasets() {
+        output = [];
+        for (var i=0; i<becasPorAnyo.length; i++) {
+          var row = {};
+          row["anyo"] = becasPorAnyo[i]["anyo"];
+          for (var k=0; k<becasPorConvenio.length; k++) {
+            var total = 0;
+            for (var j=0; j<becasPorAnyoPorConvenio[i].values.length; j++) {
+              if (becasPorAnyoPorConvenio[i].values[j]["beca"] === becasPorConvenio[k]["key"]) {
+                total = becasPorAnyoPorConvenio[i].values[j]["total"];
+              }
+            }
+            row[becasPorConvenio[k]["key"]] = total;
+          }
+          row["TOTAL"] = becasPorAnyo[i]["becas"];
+          output.push(row);
+        }
+        return output;
+      }
+
+
+
+      /**
+      Función que permite obtener las becas por convenios de una año en particular...
+      */  
+      function filtrarDataConvenios(anyo) {
+        var becasPorAnyoPorConvenioMergeFiltered = becasPorAnyoPorConvenioMerge.filter(function (d) { return d.anyo == anyo });
+        var becasPorAnyoPorConvenioMergeFilteredAnterior = becasPorAnyoPorConvenioMerge.filter(function (d) { return d.anyo == anyo - 1});
+
+        output = [];
+        for (var i = 0; i < becasPorConvenio.length; i++) {
+
+          var becasActuales = +becasPorAnyoPorConvenioMergeFiltered[0][becasPorConvenio[i]["key"]];
+          var becasAnteriores = +becasPorAnyoPorConvenioMergeFilteredAnterior[0][becasPorConvenio[i]["key"]];
+
+          output.push({"key": becasPorConvenio[i]["key"]
+                      ,"total": becasActuales
+                      ,"totalAnterior": becasAnteriores
+                      ,"var": (becasAnteriores==0)?0:(becasActuales/becasAnteriores-1)
+                      });
+        }
+        return output;
+      }
+
+
+      function determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado) {
+        var beca = becasPorAnyoPorConvenioMergeFiltrado.filter(function (d) { return d.key == columnName.key });
+        if (beca[0].var < 0) { 
+          return "#E74C3C"; 
+        } else if (beca[0].var > 0) { 
+          return "#2ECC71" 
+        } return "black"; 
+      }
+
+
+    });
+
+  </script>
+</body>

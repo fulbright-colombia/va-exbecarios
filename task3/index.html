@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="utf-8">
+<head>
+  <title>Relaciones entre universidades</title> 
+  <style>
+      html, iframe, #panel{          
+          height: 900px;
+          min-height: 100%;
+          width: 100%;
+          min-width: 100%;
+      }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css">
+</head>
+<body>
+  <select id="decada">
+    <option selected value="60decade.html">Decades 50's y 60's</option>
+    <option value="70decade.html">Decade 70's</option>
+    <option value="80decade.html">Decade 80's</option>
+    <option value="90decade.html">Decade 90's</option>
+    <option value="2Kdecade.html">Decade 2000's</option>
+    <option value="2K-15decade.html">2010 - 2015</option>
+  </select>
+  <div id="panel">
+  </div> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script>
+    $('#decada').selectmenu({
+      change: function(event, data){
+        var decade = data.item.value;
+        draw(decade);
+      }
+    });
+    function draw(decade){
+      var iframe = '<iframe src="' + decade + '"frameBorder="0"></iframe>';
+      $('#panel').empty().html(iframe);
+    }
+    draw('60decade.html');
+  </script>
+</body>
+</html>
