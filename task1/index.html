@@ -74,6 +74,7 @@
         //.style("fill", "#FBFCFC");
         .style("fill", "white");                 
 
+	  /*
     var svg2 = d3.select("#insights")
                 .append("svg")
                 .attr("width", 800)
@@ -86,7 +87,7 @@
         .attr("height", 200)                                    
         .attr("x", 0) 
         .attr("y", 0)
-        .style("fill", "white");                              
+        .style("fill", "white");  */                            
 
 
     d3.csv('data/dataStacked2.csv', function(data2) {
@@ -222,18 +223,13 @@
                           return d3.format(".0%")(beca[0].var); 
                          })
                          .style("fill", function(columnName) {return determinarColorFuente(columnName,becasPorAnyoPorConvenioMergeFiltrado)});
-
+/*
                  insight.html(function(a) {
                  	if (pointIndex <= 1978) {
                  		return "";
                  	}
                  	if (pointIndex >= 1979 && pointIndex <= 1989) { 
                  		return "The decade of Humanities and Social Sciences: in average  25 schoolarships were granted (per year)"
-
-// SUNY Stony Brook    12
-
-
-
                  	} 
                  	if (pointIndex >= 1990 && pointIndex <= 1996) {
                  		return "Granted scholarships decreased 73%. Only 4 scholarships per year where granted"	;
@@ -241,7 +237,7 @@
                  	if (pointIndex >= 1997) {
                  		return "Education: There were up to 49 granted scholarships per year. Arts & Architecture, and Biologic increased its granted scholarships as well.";
                  	}
-                 });
+                 });*/
 
               }
 
@@ -316,11 +312,11 @@
                   .attr("x", 220) 
                   .attr("y", function (d, i) { return i * legendInter + legendSpace; });
 
-        
+        /*
 		var insight = svg2.append ("text")
 						  .attr("x", 20)
 						  .attr("y", 20)
-						  .attr("class", "rotulos");
+						  .attr("class", "rotulos");*/
 
       });
 
