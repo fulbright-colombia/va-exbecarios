@@ -63,6 +63,6 @@ Table with 4.002 records belonging to ex grantees of a Fulbright Foundation scho
 - SELECT
   - Through the circles you can select a university
 
-[Demo]([https://www.youtube.com/watch?v=IWcW344DNPc)
+[Demo](https://www.youtube.com/watch?v=IWcW344DNPc)
 
 [Papper](https://fulbright-colombia.github.io/va-exbecarios/doc/PoloA-MeraD-QuinteroC-Fulbright-Colombia.pdf)
